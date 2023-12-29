@@ -1,0 +1,51 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Recipe Search</title>
+</head>
+<body>
+    <h1>Find Recipes</h1>
+    <form id="searchForm">
+        <label for="ingredients">Available Ingredients (comma-separated):</label><br>
+        <input type="text" id="ingredients" name="ingredients"><br><br>
+        <button type="button" onclick="searchRecipes()">Search</button>
+    </form>
+    <div id="recipeResults"></div>
+
+    <script>
+        function searchRecipes() {
+            const ingredients = document.getElementById('ingredients').value.split(',').map(item => item.trim());
+
+            fetch('/recipes/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ingredients: ingredients })
+            })
+            .then(response => response.json())
+            .then(data => displayRecipes(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayRecipes(recipes) {
+            const recipeResults = document.getElementById('recipeResults');
+            recipeResults.innerHTML = '';
+
+            if (recipes.length === 0) {
+                recipeResults.innerHTML = '<p>No matching recipes found</p>';
+                return;
+            }
+
+            const ul = document.createElement('ul');
+            recipes.forEach(recipe => {
+                const li = document.createElement('li');
+                li.textContent = recipe.name;
+                ul.appendChild(li);
+            });
+
+            recipeResults.appendChild(ul);
+        }
+    </script>
+</body>
+</html>
